@@ -1,4 +1,9 @@
 package com.example.pexel
 
-class DaggerApp {
+import android.app.Application
+
+class DaggerApp: Application() {
+//    val appComponent: AppComponent by lazy {
+//        DaggerAppComponent.factory().create(applicationContext)
+//    }
 }
