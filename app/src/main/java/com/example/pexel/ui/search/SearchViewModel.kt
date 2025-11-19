@@ -1,5 +1,6 @@
 package com.example.pexel.ui.search
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -29,7 +30,7 @@ class SearchViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
 
     val searchPhotoPagingFlow: Flow<PagingData<Photo>> = _searchQuery
-        .debounce(300)
+        .debounce(200)
         .distinctUntilChanged()
         .flatMapLatest { query ->
             if (query.isBlank()) {
@@ -88,7 +89,11 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun setError() {
-        _searchScreenState.update { it.copy(isError = true, isLoading = false) }
+        try {
+            _searchScreenState.update { it.copy(isError = true, isLoading = false) }
+        } catch (e: Exception) {
+            Log.d("ERROR", "$e")
+        }
     }
 
 }
