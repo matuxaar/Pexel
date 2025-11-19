@@ -9,9 +9,12 @@ import com.example.pexel.domain.model.Photo
 import com.example.pexel.domain.repository.PhotoRepository
 import com.example.pexel.ui.search.data.SearchScreenAction
 import com.example.pexel.ui.search.data.SearchScreenState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
@@ -29,6 +32,7 @@ class SearchViewModel @Inject constructor(
 
     private val _searchQuery = MutableStateFlow("")
 
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val searchPhotoPagingFlow: Flow<PagingData<Photo>> = _searchQuery
         .debounce(200)
         .distinctUntilChanged()
@@ -37,6 +41,7 @@ class SearchViewModel @Inject constructor(
                 flowOf(PagingData.empty())
             } else {
                 photoRepository.getSearchPhotos(query = query)
+                    .catch { emit(PagingData.empty()) }
             }
         }
         .cachedIn(viewModelScope)
@@ -51,23 +56,29 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun loadCollections() {
-        viewModelScope.launch {
-            _searchScreenState.update { it.copy(isLoading = true, isError = false) }
-            val result = photoRepository.getCollections()
-            result.fold(
-                onSuccess = { collections ->
-                    _searchScreenState.update {
-                        it.copy(
-                            collections = collections,
-                            isLoading = false,
-                            isError = false
-                        )
+        runCatching {
+            viewModelScope.launch {
+                _searchScreenState.update { it.copy(isLoading = true, isError = false) }
+                val result = photoRepository.getCollections()
+                result.fold(
+                    onSuccess = { collections ->
+                        if (collections.isEmpty()) {
+                            _searchScreenState.update { it.copy(isError = true, isLoading = false) }
+                        } else {
+                            _searchScreenState.update {
+                                it.copy(
+                                    collections = collections,
+                                    isLoading = false,
+                                    isError = false
+                                )
+                            }
+                        }
+                    },
+                    onFailure = {
+                        _searchScreenState.update { it.copy(isError = true, isLoading = false) }
                     }
-                },
-                onFailure = {
-                    _searchScreenState.update { it.copy(isError = true, isLoading = false) }
-                }
-            )
+                )
+            }
         }
     }
 

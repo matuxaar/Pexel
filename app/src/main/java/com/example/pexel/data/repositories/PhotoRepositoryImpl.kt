@@ -44,11 +44,12 @@ class PhotoRepositoryImpl @Inject constructor(
 
     override suspend fun getCollections(): Result<List<Collection>> =
         withContext(Dispatchers.IO) {
-            val response = photoService.getFeaturedCollections(
-                mapOf()
-            )
-            val collections = response.collections.map { oneCollectionMapper(it) }
-            Result.success(collections)
+            runCatching {
+                val response = photoService.getFeaturedCollections(
+                    mapOf()
+                )
+                response.collections.map { oneCollectionMapper(it) }
+            }
         }
 
     override suspend fun addToBookmarks(photo: Photo) = withContext(Dispatchers.IO) {

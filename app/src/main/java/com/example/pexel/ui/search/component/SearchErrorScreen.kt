@@ -23,7 +23,7 @@ fun SearchErrorScreen(
     ) {
         Text(
             text = stringResource(R.string.error),
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
         TryAgainButton(onTryAgain)
