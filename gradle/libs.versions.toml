@@ -23,6 +23,7 @@ room = "2.8.3"
 coil = "2.7.0"
 navigation_compose = "2.9.5"
 androidxComposeMaterial3Adaptive = "1.2.0"
+material3 = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -57,6 +58,7 @@ room-ktx = {group = "androidx.room", name = "room-ktx", version.ref = "room"}
 room-paging = {group = "androidx.room", name = "room-paging", version.ref = "room"}
 room-compiler = {group = "androidx.room", name = "room-compiler", version.ref = "room"}
 paging = {group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "paging"}
+paging-compose = {group = "androidx.paging", name = "paging-compose", version.ref = "paging"}
 splash-screen = {group = "androidx.core", name = "core-splashscreen", version.ref = "splash_screen"}
 
 androidx-compose-material-iconsExtended = { group = "androidx.compose.material", name = "material-icons-extended" }
@@ -66,6 +68,7 @@ androidx-compose-material3-adaptive = { group = "androidx.compose.material3.adap
 androidx-compose-material3-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout", version.ref = "androidxComposeMaterial3Adaptive" }
 androidx-compose-material3-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "androidxComposeMaterial3Adaptive" }
 androidx-compose-material3-windowSizeClass = { group = "androidx.compose.material3", name = "material3-window-size-class" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 
 [plugins]

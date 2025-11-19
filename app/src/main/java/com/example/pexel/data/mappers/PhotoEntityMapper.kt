@@ -8,7 +8,7 @@ class PhotoEntityMapper @Inject constructor(
     private val srcEntityMapper: SrcEntityMapper
 ) {
 
-    operator fun invoke (photoEntity: PhotoEntity): Photo = with(photoEntity) {
+    operator fun invoke(photoEntity: PhotoEntity): Photo = with(photoEntity) {
         return Photo(
             id = id,
             width = width,
@@ -16,7 +16,8 @@ class PhotoEntityMapper @Inject constructor(
             url = url,
             photographer = photographer,
             liked = liked,
-            src = srcEntityMapper(src)
+            src = srcEntityMapper(src),
+            alt = alt
         )
     }
 }

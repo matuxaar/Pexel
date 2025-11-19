@@ -1,5 +1,7 @@
 package com.example.pexel.data.models
 
+import com.squareup.moshi.Json
+
 data class CollectionResponse(
-    val title: String
+    @param:Json(name = "title") val title: String
 )
