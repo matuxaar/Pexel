@@ -10,12 +10,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.pexel.di.ViewModelFactoryState
 import com.example.pexel.di.daggerViewModel
 import com.example.pexel.domain.model.Collection
+import com.example.pexel.domain.model.Photo
 import com.example.pexel.ui.component.HorizontalProgressBar
 import com.example.pexel.ui.search.component.CollectionGrid
+import com.example.pexel.ui.search.component.EmptySearchResultScreen
 import com.example.pexel.ui.search.component.PexelSearchBar
 import com.example.pexel.ui.search.component.PhotoListForSearch
 import com.example.pexel.ui.search.component.SearchErrorScreen
@@ -75,24 +78,13 @@ private fun SearchScreenContent(
         )
 
         when {
-            searchScreenState.isError -> {
-                SearchErrorScreen {
-                    handleAction(SearchScreenAction.Reload)
-                }
-            }
-
             searchScreenState.searchQuery.isNotBlank() -> {
-                if (photos.itemCount == 0 && photos.loadState.refresh is LoadState.NotLoading) {
-                    SearchErrorScreen {
-                        handleAction(SearchScreenAction.Reload)
-                    }
-                } else {
-                    PhotoListForSearch(
-                        photoList = photos,
-                        lazyVerticalStaggeredState = lazyStaggeredGridState,
-                        onDetailsClickFromSearch = onDetailsClickFromSearch
-                    )
-                }
+                SearchResultContent(
+                    photos = photos,
+                    handleAction = handleAction,
+                    lazyStaggeredGridState = lazyStaggeredGridState,
+                    onDetailsClickFromSearch = onDetailsClickFromSearch
+                )
             }
 
             else -> {
@@ -103,6 +95,41 @@ private fun SearchScreenContent(
                     }
                 )
             }
+        }
+    }
+
+}
+
+@Composable
+private fun SearchResultContent(
+    photos: LazyPagingItems<Photo>,
+    handleAction: (SearchScreenAction) -> Unit,
+    lazyStaggeredGridState: LazyStaggeredGridState,
+    onDetailsClickFromSearch: (Int) -> Unit
+) {
+    val refresh = photos.loadState.refresh
+    val append = photos.loadState.append
+
+    when (refresh) {
+        is LoadState.Error -> {
+            SearchErrorScreen {
+                handleAction(SearchScreenAction.ErrorSearch)
+            }
+        }
+
+        is LoadState.NotLoading if photos.itemCount == 0
+                && append.endOfPaginationReached -> {
+            EmptySearchResultScreen {
+                handleAction(SearchScreenAction.Reload)
+            }
+        }
+
+        else -> {
+            PhotoListForSearch(
+                photoList = photos,
+                lazyVerticalStaggeredState = lazyStaggeredGridState,
+                onDetailsClickFromSearch = onDetailsClickFromSearch
+            )
         }
     }
 }

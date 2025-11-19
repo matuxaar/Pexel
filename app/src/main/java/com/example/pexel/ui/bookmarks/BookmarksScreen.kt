@@ -4,11 +4,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.pexel.di.ViewModelFactoryState
@@ -39,6 +42,14 @@ fun BookmarksScreen(
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
     val photoList = bookmarksViewModel.bookmarksFlow.collectAsLazyPagingItems()
 
+    LaunchedEffect(Unit) {
+        photoList.refresh()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose { photoList.refresh() }
+    }
+
     BookmarksScreenContent(
         onPhotoDetailsClick = onPhotoDetailsClick,
         onNavigateToHomeClick = onNavigateToHomeClick,
@@ -58,20 +69,28 @@ private fun BookmarksScreenContent(
 ) {
     val isLoading = bookmarksScreenState.isLoading
     val isError = bookmarksScreenState.isError
-    Column(
+    val isRefreshing = photoList.loadState.refresh is LoadState.Loading
+
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = { photoList.refresh() },
         modifier = Modifier.fillMaxSize()
     ) {
-        TopBar()
-        when {
-            isLoading -> HorizontalProgressBar()
-            isError -> ErrorBookmarks { onNavigateToHomeClick() }
-            else -> PhotoListForBookmarks(
-                photoList = photoList,
-                onDetailsClickFromBookmarks = onPhotoDetailsClick,
-                onNavigateToHomeClick = onNavigateToHomeClick,
-                lazyVerticalStaggeredState = lazyStaggeredGridState
-            )
-        }
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            TopBar()
+            when {
+                isLoading -> HorizontalProgressBar()
+                isError -> ErrorBookmarks { onNavigateToHomeClick() }
+                else -> PhotoListForBookmarks(
+                    photoList = photoList,
+                    onDetailsClickFromBookmarks = onPhotoDetailsClick,
+                    onNavigateToHomeClick = onNavigateToHomeClick,
+                    lazyVerticalStaggeredState = lazyStaggeredGridState
+                )
+            }
 
+        }
     }
 }

@@ -21,7 +21,7 @@ fun ExploreButton(onErrorClick: () -> Unit) {
         Text(
             text = stringResource(R.string.explore),
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.clickable { onErrorClick() }
         )
     }
@@ -37,6 +37,7 @@ fun TryAgainButton(onTryAgainClick: () -> Unit) {
         Text(
             text = stringResource(R.string.try_again),
             style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.clickable { onTryAgainClick() }
         )
     }

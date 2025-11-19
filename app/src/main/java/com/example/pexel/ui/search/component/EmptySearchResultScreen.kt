@@ -13,7 +13,7 @@ import com.example.pexel.R
 import com.example.pexel.ui.component.TryAgainButton
 
 @Composable
-fun SearchErrorScreen(
+fun EmptySearchResultScreen(
     onTryAgain: () -> Unit
 ) {
     Column(
@@ -22,9 +22,8 @@ fun SearchErrorScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = stringResource(R.string.error),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onBackground
+            text = stringResource(R.string.nothing_found),
+            style = MaterialTheme.typography.bodyLarge,
         )
         TryAgainButton(onTryAgain)
     }

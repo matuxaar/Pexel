@@ -25,7 +25,7 @@ fun ErrorHome(onTryAgainClick: () -> Unit) {
             contentDescription = null,
             modifier = Modifier
                 .padding(12.dp)
-                .fillMaxSize(),
+                .fillMaxSize(0.5f),
         )
         TryAgainButton(
             onTryAgainClick = onTryAgainClick
