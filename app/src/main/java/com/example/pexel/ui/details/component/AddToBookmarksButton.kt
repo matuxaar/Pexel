@@ -33,8 +33,8 @@ fun AddToBookmarksButton(
         Icon(
             painter = painterResource(id = icon),
             contentDescription = null,
-            tint = if (liked) MaterialTheme.colorScheme.onPrimary
-            else MaterialTheme.colorScheme.onBackground
+            tint = if (liked) MaterialTheme.colorScheme.onBackground
+            else MaterialTheme.colorScheme.onSurface
         )
     }
 }
