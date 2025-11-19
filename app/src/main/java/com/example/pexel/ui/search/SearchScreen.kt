@@ -23,6 +23,7 @@ import com.example.pexel.ui.search.component.PexelSearchBar
 import com.example.pexel.ui.search.component.PhotoListForSearch
 import com.example.pexel.ui.search.component.SearchErrorScreen
 import com.example.pexel.ui.search.data.SearchScreenAction
+import com.example.pexel.ui.search.data.SearchScreenState
 
 @Composable
 fun SearchScreen(
@@ -34,6 +35,7 @@ fun SearchScreen(
 
     val state by searchViewModel.searchScreenState.collectAsState()
     val lazyStaggeredGridState = rememberLazyStaggeredGridState()
+    val photos = searchViewModel.searchPhotoPagingFlow.collectAsLazyPagingItems()
 
     val handleAction: (SearchScreenAction) -> Unit = {
         searchViewModel.handleAction(it)
@@ -44,67 +46,103 @@ fun SearchScreen(
     }
 
     SearchScreenContent(
-        searchViewModel = searchViewModel,
         collections = state.collections,
         onDetailsClickFromSearch = onDetailsClickFromSearch,
         lazyStaggeredGridState = lazyStaggeredGridState,
-        handleAction = handleAction
+        handleAction = handleAction,
+        searchScreenState = state,
+        photos = photos
     )
 
 }
 
 @Composable
 private fun SearchScreenContent(
-    searchViewModel: SearchViewModel,
     collections: List<Collection>,
     onDetailsClickFromSearch: (Int) -> Unit,
     lazyStaggeredGridState: LazyStaggeredGridState,
     handleAction: (SearchScreenAction) -> Unit,
+    searchScreenState: SearchScreenState,
+    photos: LazyPagingItems<Photo>
 ) {
-    val searchScreenState by searchViewModel.searchScreenState.collectAsState()
-    val photos = searchViewModel.searchPhotoPagingFlow.collectAsLazyPagingItems()
     val textFieldState = remember(searchScreenState.searchQuery) {
         TextFieldState(searchScreenState.searchQuery)
     }
+
     Column {
-        if (photos.loadState.append is LoadState.Loading) {
-            HorizontalProgressBar()
-        }
-        PexelSearchBar(
-            textFieldState = textFieldState,
-            onSearch = { query ->
-                handleAction(SearchScreenAction.Search(query))
-            }
-        )
+        if (searchScreenState.searchQuery.isNotBlank()) {
+            PexelSearchBar(
+                textFieldState = textFieldState,
+                onSearch = { query -> handleAction(SearchScreenAction.Search(query)) }
+            )
 
-        when {
-            searchScreenState.searchQuery.isNotBlank() -> {
-                SearchResultContent(
-                    photos = photos,
-                    handleAction = handleAction,
-                    lazyStaggeredGridState = lazyStaggeredGridState,
-                    onDetailsClickFromSearch = onDetailsClickFromSearch
-                )
-            }
-
-            else -> {
-                CollectionGrid(
-                    collections = collections,
-                    onCollectionClicked = { title ->
-                        handleAction(SearchScreenAction.Search(title))
-                    }
-                )
-            }
+            SearchResultContent(
+                photos = photos,
+                lazyStaggeredGridState = lazyStaggeredGridState,
+                onDetailsClickFromSearch = onDetailsClickFromSearch,
+                handleAction = handleAction
+            )
+        } else {
+            SearchContent(
+                searchScreenState = searchScreenState,
+                collections = collections,
+                handleAction = handleAction,
+                textFieldState = textFieldState
+            )
         }
     }
+}
 
+@Composable
+private fun SearchContent(
+    searchScreenState: SearchScreenState,
+    collections: List<Collection>,
+    handleAction: (SearchScreenAction) -> Unit,
+    textFieldState: TextFieldState
+) {
+    when {
+        searchScreenState.isLoading -> {
+            HorizontalProgressBar()
+        }
+
+        searchScreenState.isError || collections.isEmpty() -> {
+            SearchErrorScreen { handleAction(SearchScreenAction.Reload) }
+        }
+
+        else -> {
+            SuccessSearchContent(
+                textFieldState = textFieldState,
+                handleAction = handleAction,
+                collections = collections
+            )
+        }
+    }
+}
+
+@Composable
+private fun SuccessSearchContent(
+    textFieldState: TextFieldState,
+    handleAction: (SearchScreenAction) -> Unit,
+    collections: List<Collection>
+) {
+    PexelSearchBar(
+        textFieldState = textFieldState,
+        onSearch = { query -> handleAction(SearchScreenAction.Search(query)) }
+    )
+
+    CollectionGrid(
+        collections = collections,
+        onCollectionClicked = { title ->
+            handleAction(SearchScreenAction.Search(title))
+        }
+    )
 }
 
 @Composable
 private fun SearchResultContent(
     photos: LazyPagingItems<Photo>,
-    handleAction: (SearchScreenAction) -> Unit,
     lazyStaggeredGridState: LazyStaggeredGridState,
+    handleAction: (SearchScreenAction) -> Unit,
     onDetailsClickFromSearch: (Int) -> Unit
 ) {
     val refresh = photos.loadState.refresh
@@ -113,7 +151,7 @@ private fun SearchResultContent(
     when (refresh) {
         is LoadState.Error -> {
             SearchErrorScreen {
-                handleAction(SearchScreenAction.ErrorSearch)
+                handleAction(SearchScreenAction.Reload)
             }
         }
 
