@@ -68,6 +68,7 @@ private fun SearchScreenContent(
     val textFieldState = remember(searchScreenState.searchQuery) {
         TextFieldState(searchScreenState.searchQuery)
     }
+
     Column {
         if (searchScreenState.searchQuery.isNotBlank()) {
             PexelSearchBar(
