@@ -14,5 +14,6 @@ data class PhotoEntity(
     @ColumnInfo val url: String,
     @ColumnInfo val photographer: String,
     @ColumnInfo val liked: Boolean,
+    @ColumnInfo val alt: String,
     @Embedded val src: SrcEntity
 )

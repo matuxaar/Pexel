@@ -7,14 +7,14 @@ import javax.inject.Inject
 
 class PhotoMapper @Inject constructor() {
 
-    operator fun invoke(photoResponse: PhotoResponse) : Photo = with(photoResponse) {
+    operator fun invoke(photoResponse: PhotoResponse): Photo = with(photoResponse) {
         return Photo(
-            id = id ?: 0,
+            id = id ?: -1,
             width = width ?: 0,
             height = height ?: 0,
             url = url.orEmpty(),
             photographer = photographer.orEmpty(),
-            src = (src ?: Src()) as Src,
+            src = src?.let { SrcResponseMapper()(it) } ?: Src(),
             alt = alt.orEmpty()
         )
     }

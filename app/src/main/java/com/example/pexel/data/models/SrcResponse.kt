@@ -1,12 +1,14 @@
 package com.example.pexel.data.models
 
+import com.squareup.moshi.Json
+
 data class SrcResponse(
-    val landscape: String? = null,
-    val large: String? = null,
-    val large2x: String? = null,
-    val medium: String? = null,
-    val original: String? = null,
-    val portrait: String? = null,
-    val small: String? = null,
-    val tiny: String? = null
+    @param:Json(name = "landscape") val landscape: String? = null,
+    @param:Json(name = "large") val large: String? = null,
+    @param:Json(name = "large2x") val large2x: String? = null,
+    @param:Json(name = "medium") val medium: String? = null,
+    @param:Json(name = "original") val original: String? = null,
+    @param:Json(name = "portrait") val portrait: String? = null,
+    @param:Json(name = "small") val small: String? = null,
+    @param:Json(name = "tiny") val tiny: String? = null
 )

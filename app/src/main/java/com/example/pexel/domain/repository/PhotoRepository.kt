@@ -7,19 +7,22 @@ import kotlinx.coroutines.flow.Flow
 
 interface PhotoRepository {
 
-    suspend fun getCuratedPhotos(page: Int): Result<List<Photo>>
+    fun getSearchPhotos(query: String): Flow<PagingData<Photo>>
 
-    suspend fun getSearchPhotos(page: Int, query: String): Result<List<Photo>>
+    fun subscribeToPhotos(): Flow<PagingData<Photo>>
+
+    fun subscribeToPhotosFromBookmarks(): Flow<PagingData<Photo>>
 
     suspend fun getCollections(): Result<List<Collection>>
 
     suspend fun addToBookmarks(photo: Photo)
 
-    suspend fun removeFromBookmarks(photoId: Int, liked: Boolean)
+    suspend fun removeFromBookmarks(photoId: Int)
 
-    fun subscribeToPhotos(): Flow<PagingData<Photo>>
+    suspend fun getPhotoById(id: Int): Photo?
 
-    fun subscribeToPhoto(id: Int): Flow<Photo?>
+    suspend fun isPhotoBookmarked(photoId: Int): Boolean
 
-    fun getPhoto(id: Int): Flow<Photo>
+    suspend fun getPhotoRemoteById(id: Int): Result<Photo>
+
 }

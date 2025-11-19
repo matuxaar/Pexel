@@ -1,8 +1,9 @@
 package com.example.pexel.data.models
 
+import com.example.pexel.domain.model.Photo
 import com.squareup.moshi.Json
 
-data class Response(
+data class CuratedResponse(
     @param:Json(name = "per_page") val perPage: Int = 0,
     @param:Json(name = "next_page") val nextPage: String = "",
     @param:Json(name = "total_result") val totalResult: Int = 0,
